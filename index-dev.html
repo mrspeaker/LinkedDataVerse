@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>RDF Explorer</title>
+  </head>
+  <body>
+
+    <div id="board"></div>
+
+    <input type="text" id="uri" value="http://dbpedia.org/data3/Beverage.json" />
+
+    <button
+      id="fetch-uri"
+      type="button"
+      onclick="RDFExplorer.App().fetch()">Fetch</button>
+
+    <script src="./src/main/resources/threejs/three.js"></script>
+    <script src="./src/main/resources/threejs/CSS3DRenderer.js"></script>
+    <script src="./target/scala-2.11/rdf-explorer-fastopt.js"></script>
+
+    <script>
+      RDFExplorer.App().main();
+    </script>
+
+  </body>
+</html>
