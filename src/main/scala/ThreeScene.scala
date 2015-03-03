@@ -1,9 +1,10 @@
-package RDFExplorer.scenes;
+package RDFExplorer.scenes
 
 import scala.scalajs.js
 import org.denigma.threejs._
 import org.denigma.threejs.extensions.Container3D
-
+//import org.denigma.threejs.extensions.controls.{CameraControls}
+import org.denigma.threejs.extensions.controls._
 import org.scalajs.dom.raw.HTMLElement
 import scala.util.Random
 
@@ -14,6 +15,8 @@ import dom.document
 class ThreeScene(val container:HTMLElement, val width:Double, val height:Double) extends Container3D {
 
   override def distance = 15
+
+  override val controls = new NavControls(camera,this.container)
 
   def TextPlane (text: String): Mesh = {
 
@@ -104,6 +107,9 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
   })
 
   //camera.position.set(10, 15, 10);
+  camera.aspect = dom.window.innerWidth / height
+  camera.updateProjectionMatrix()
+  renderer.setSize( dom.window.innerWidth, height );
 
   override def onEnterFrame() {
 

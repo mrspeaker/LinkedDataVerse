@@ -10,7 +10,7 @@ import dom.document
 import org.scalajs.dom.raw.HTMLElement
 import org.scalajs.dom.html
 
-import RDFExplorer.scenes._;
+import RDFExplorer.scenes._
 
 object App extends JSApp {
 
