@@ -1,4 +1,4 @@
-package RDFExplorer.scenes
+package RDFExplorer.controls
 
 import org.denigma.threejs.{Vector2, Vector3, Camera}
 import org.denigma.threejs.extensions.controls._

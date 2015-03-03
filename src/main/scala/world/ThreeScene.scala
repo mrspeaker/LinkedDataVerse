@@ -1,10 +1,12 @@
-package RDFExplorer.scenes
+package RDFExplorer.world
 
 import scala.scalajs.js
 import org.denigma.threejs._
 import org.denigma.threejs.extensions.Container3D
 //import org.denigma.threejs.extensions.controls.{CameraControls}
-import org.denigma.threejs.extensions.controls._
+import org.denigma.threejs.extensions.controls.CameraControls
+import RDFExplorer.controls.NavControls
+
 import org.scalajs.dom.raw.HTMLElement
 import scala.util.Random
 
@@ -16,51 +18,14 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
 
   override def distance = 15
 
-  override val controls = new NavControls(camera,this.container)
+  override val controls = new NavControls(camera, this.container)
 
-  def TextPlane (text: String): Mesh = {
-
-    val canvas = document.createElement("canvas").asInstanceOf[html.Canvas]
-    val ctx = canvas.getContext("2d")
-    ctx.width = 256
-    ctx.height = 80
-    ctx.textAlign = "center";
-    ctx.font = "22pt Helvetica"
-    ctx.fillStyle = "#000000"
-    ctx.fillText(text, 256/2, 30)
-
-    val texture = new Texture(canvas);
-    texture.needsUpdate = true;
-
-    val canMaterial = new MeshBasicMaterial(js.Dynamic.literal(
-      map = texture,
-      transparent = true
-    ).asInstanceOf[MeshBasicMaterialParameters]);
-
-    val canGeometry = new PlaneGeometry(canvas.width, canvas.height, 1, 1);
-    val planeMesh = new Mesh(canGeometry, canMaterial);
-    planeMesh.scale.set(0.01, 0.01, 0.01);
-    planeMesh
-  }
-
-  // Some lights
-  val dirLight1 = new DirectionalLight(0xffffff, 0.9)
-  dirLight1.position.set(1, 1, 1.5).normalize()
-  scene.add(dirLight1)
-
-  val dirLight2 = new DirectionalLight(0x9999ff, 0.5)
-  dirLight2.position.set(-1, -1, -1).normalize()
-  scene.add(dirLight2)
-
-  val ambLight = new AmbientLight(0x434343)
-  scene.add(ambLight);
-
-  scene.fog = new Fog(0xffffff, 10, 25);
+  Lights(scene);
 
   val boxGeom = new BoxGeometry(1, 1, 1)
 
   def materialParams(col: Int) = js.Dynamic.literal(
-    color = new Color().setHex(col)//,
+    color = new Color().setHex(col) //,
     //wireframe = true
   ).asInstanceOf[MeshLambertMaterialParameters]
 
@@ -79,7 +44,8 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
 
   })
 
-  // Derp, scala.js is forcing me to used LineDashed... LineBasic is complaining?
+  // Derp, scala.js is forcing me to used LineDashed...
+  // https://github.com/antonkulaga/scala-js-facades/issues/2
   val lineMaterial = new LineDashedMaterial(js.Dynamic.literal(
     color = new Color().setHex(0x0088ff)
   ).asInstanceOf[LineDashedMaterialParameters]);
