@@ -72,6 +72,7 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   var scale: Double = 1.0
 
   var lastPosition = new Vector3()
+  var lastMousePos = (0d, 0d)
 
   def autoRotationAngle(): Double =  2 * Math.PI / 60 / 60 * autoRotateSpeed
 
@@ -222,10 +223,9 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
     }
   }
 
-  def onMouseMove(event:MouseEvent) =
-  {
+  def onMouseMove(event:MouseEvent) = {
     rotateOnMove(event)
-
+    lastMousePos = (event.clientX, event.clientY)
   }
 
   def onContextMenu(event:Event):js.Any = {
@@ -241,12 +241,17 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   {
     var delta = 0
     val wheel = event.asInstanceOf[js.Dynamic]
-    if ( wheel.wheelDelta != 0 ) { // WebKit / Opera / Explorer 9
-      delta = wheel.wheelDelta.asInstanceOf[Int]
-    } else if ( wheel.detail !=0) { // Firefox
+   // if ( wheel.wheelDelta != 0 ) { // WebKit / Opera / Explorer 9
+    //  delta = wheel.wheelDelta.asInstanceOf[Int]
+    //} else
+    if ( wheel.detail != 0 ) { // Firefox
       delta = - event.detail:Int
     }
-    if ( delta > 0 )    zoomOut() else   zoomIn()
+    if ( delta > 0 ) {
+      zoomOut()
+    } else {
+      zoomIn()
+    }
 
   }
 
