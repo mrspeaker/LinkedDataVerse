@@ -15,6 +15,30 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
 
   override def distance = 15
 
+  def TextPlane (text: String): Mesh = {
+
+    val canvas = document.createElement("canvas").asInstanceOf[html.Canvas]
+    val ctx = canvas.getContext("2d")
+    ctx.width = 256
+    ctx.height = 80
+    ctx.textAlign = "center";
+    ctx.font = "22pt Helvetica"
+    ctx.fillStyle = "#000000"
+    ctx.fillText(text, 256/2, 30)
+
+    val texture = new Texture(canvas);
+    texture.needsUpdate = true;
+
+    val canMaterial = new MeshBasicMaterial(js.Dynamic.literal(
+      map = texture,
+      transparent = true
+    ).asInstanceOf[MeshBasicMaterialParameters]);
+
+    val canGeometry = new PlaneGeometry(canvas.width, canvas.height, 1, 1);
+    val planeMesh = new Mesh(canGeometry, canMaterial);
+    planeMesh.scale.set(0.01, 0.01, 0.01);
+    planeMesh
+  }
 
   // Some lights
   val dirLight1 = new DirectionalLight(0xffffff, 0.9)
@@ -28,6 +52,8 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
   val ambLight = new AmbientLight(0x434343)
   scene.add(ambLight);
 
+  scene.fog = new Fog(0xffffff, 10, 25);
+
   val boxGeom = new BoxGeometry(1, 1, 1)
 
   def materialParams(col: Int) = js.Dynamic.literal(
@@ -38,10 +64,9 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
   val plainMaterial = new MeshLambertMaterial(materialParams(0xffffff))
 
   val space = 1.5
-  val meshes:Seq[Mesh] = Range(0, 5 * 5).map(i => {
+  val meshes:Seq[Mesh] = Range(0, 25).map(i => {
 
     val mesh = new Mesh(boxGeom, plainMaterial)
-    //mesh.position.copy(new Vector3(i % 5 * space, i / 5 * space, 0))
     mesh.position.copy(new Vector3(
       Random.nextInt(10) - 5,
       Random.nextInt(10) - 5,
@@ -67,30 +92,16 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
   val line = new Line(lineGeo, lineMaterial);
   scene.add(line);
 
-  // Testing drawing canvas on a plane
-  val canvas = document.createElement("canvas").asInstanceOf[html.Canvas]
-  val ctx = canvas.getContext("2d")
-  ctx.width = 256
-  ctx.height = 80
-  ctx.textAlign = "center";
-  ctx.font = "22pt Helvetica"
-  ctx.fillStyle = "#000000"
-  ctx.fillText("Test canvas text", 256/2, 30)
+  Range(0, 5).map(i => {
 
-  val texture = new Texture(canvas);
-  texture.needsUpdate = true;
+    val testText = TextPlane("Test text " + i)
+    testText.position.copy(new Vector3(
+      Random.nextInt(10) - 5,
+      Random.nextInt(10) - 5,
+      -5 - Random.nextInt(10)))
+    scene.add(testText)
 
-  val canMaterial = new MeshBasicMaterial(js.Dynamic.literal(
-    map = texture,
-    transparent = true
-  ).asInstanceOf[MeshBasicMaterialParameters]);
-
-  val canGeometry = new PlaneGeometry(canvas.width, canvas.height, 1, 1);
-  val planeMesh = new Mesh(canGeometry, canMaterial);
-  planeMesh.scale.set(0.01, 0.01, 0.01);
-  planeMesh.position.set(0, 0, 0)
-
-  scene.add(planeMesh);
+  })
 
   //camera.position.set(10, 15, 10);
 
