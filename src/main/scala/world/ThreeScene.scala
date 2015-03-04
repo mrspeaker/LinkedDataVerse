@@ -13,7 +13,10 @@ import org.scalajs.dom.html
 import org.scalajs.dom
 import dom.document
 
-class ThreeScene(val container:HTMLElement, val width:Double, val height:Double) extends Container3D {
+class ThreeScene(
+  val container:HTMLElement,
+  var width:Double,
+  var height:Double) extends Container3D {
 
   override def distance = 15
 
@@ -27,7 +30,6 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
     color = new Color().setHex(0xffffff)
   ).asInstanceOf[MeshLambertMaterialParameters])
 
-  val space = 1.5
   val meshes:Seq[Mesh] = Range(0, 25).map(i => {
 
     val mesh = new Mesh(boxGeom, plainMaterial)
@@ -54,8 +56,7 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
     el
   }
 
-  val line = new Line(lineGeo, lineMaterial);
-  scene.add(line);
+  scene.add(new Line(lineGeo, lineMaterial));
 
   Range(0, 5).map(i => {
 
@@ -68,15 +69,11 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
 
   })
 
-  // Set to width (todo: handle resize)
-  camera.aspect = dom.window.innerWidth / height
-  camera.updateProjectionMatrix()
-  renderer.setSize( dom.window.innerWidth, height );
-
   val projector = new Projector()
   val raycaster = new Raycaster()
 
   def findIntersections(x:Double, y:Double) = {
+
     val vector = new Vector3( x, y, 1 )
     projector.unprojectVector( vector, camera )
 
@@ -110,11 +107,26 @@ class ThreeScene(val container:HTMLElement, val width:Double, val height:Double)
     meshes(1).rotation.y += 0.01;
     meshes(2).rotation.y += 0.015;
 
-    val hits = onCursorMove(controls.lastMousePos._1, controls.lastMousePos._2, width, height);
+    val hits = onCursorMove(
+      controls.lastMousePos._1,
+      controls.lastMousePos._2,
+      width,
+      height);
+
     if (!hits.isEmpty) {
       hits.head._1.position.z -= 0.05;
     }
 
   }
+
+  def onResize () = {
+    width = dom.window.innerWidth
+    camera.aspect = dom.window.innerWidth / height
+    camera.updateProjectionMatrix()
+    renderer.setSize(dom.window.innerWidth, height);
+    width
+  }
+  dom.window.addEventListener("resize", (e:dom.Event) => onResize(), false)
+  onResize()
 
 }

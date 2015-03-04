@@ -11,7 +11,6 @@ import scala.scalajs.js
 
 object NavControls {
 
-
   class HoverState
   case object Zoom extends HoverState
   case object Rotate extends HoverState
@@ -19,8 +18,6 @@ object NavControls {
   case object Calm extends HoverState
 
 }
-
-
 
 class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new Vector3()) extends RotateControls {
 
@@ -145,8 +142,6 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
     scale = 1
 
     if ( lastPosition.distanceTo( this.camera.position ) > 0 ) {
-
-      //this.dispatchEvent( changeEvent )
 
       lastPosition.copy( camera.position )
 
