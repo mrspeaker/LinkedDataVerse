@@ -1,4 +1,4 @@
-# RDF Explorer
+# Linked Data Explorer
 
 To compile, run:
 
