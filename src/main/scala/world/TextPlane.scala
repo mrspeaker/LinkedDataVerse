@@ -1,4 +1,4 @@
-package RDFExplorer.world
+package LinkedDataVerse.world
 
 import scala.scalajs.js
 import org.denigma.threejs._
@@ -14,11 +14,11 @@ object TextPlane {
     val canvas = document.createElement("canvas").asInstanceOf[html.Canvas]
     val ctx = canvas.getContext("2d")
     ctx.width = 256
-    ctx.height = 80
+    ctx.height = 128
     ctx.textAlign = "center";
     ctx.font = "22pt Helvetica"
     ctx.fillStyle = "#000000"
-    ctx.fillText(text, 256/2, 30)
+    ctx.fillText(text, 256 / 2, 30)
 
     val texture = new Texture(canvas);
     texture.needsUpdate = true;

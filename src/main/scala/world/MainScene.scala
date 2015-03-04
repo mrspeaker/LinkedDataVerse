@@ -1,10 +1,10 @@
-package RDFExplorer.world
+package LinkedDataVerse.world
 
 import scala.scalajs.js
 import org.denigma.threejs._
 import org.denigma.threejs.extensions.Container3D
 import org.denigma.threejs.extensions.controls.CameraControls
-import RDFExplorer.controls.NavControls
+import LinkedDataVerse.controls.NavControls
 
 import org.scalajs.dom.raw.HTMLElement
 import scala.util.Random
@@ -13,14 +13,24 @@ import org.scalajs.dom.html
 import org.scalajs.dom
 import dom.document
 
-class ThreeScene(
+class MainScene(
   val container:HTMLElement,
   var width:Double,
   var height:Double) extends Container3D {
 
   override def distance = 15
-
   override val controls = new NavControls(camera, this.container)
+
+  private def randPos() = new Vector3(
+    Random.nextInt(10) - 5,
+    Random.nextInt(10) - 5,
+    -5 - Random.nextInt(10))
+
+  def addABox(text: String) {
+    val testText = TextPlane(text)
+    testText.position.copy(randPos())
+    scene.add(testText)
+  }
 
   Lights(scene);
 
@@ -30,13 +40,10 @@ class ThreeScene(
     color = new Color().setHex(0xffffff)
   ).asInstanceOf[MeshLambertMaterialParameters])
 
-  val meshes:Seq[Mesh] = Range(0, 25).map(i => {
+  val meshes:Seq[Mesh] = Range(0, 10).map(i => {
 
     val mesh = new Mesh(boxGeom, plainMaterial)
-    mesh.position.copy(new Vector3(
-      Random.nextInt(10) - 5,
-      Random.nextInt(10) - 5,
-      -5 - Random.nextInt(10)))
+    mesh.position.copy(randPos())
     scene.add(mesh)
     mesh
 
@@ -50,7 +57,6 @@ class ThreeScene(
 
   val lineGeo = new Geometry();
   meshes.foldLeft (meshes(0)) { (ac, el) =>
-    // TODO: make right angles to dest.
     lineGeo.vertices.push(el.position.clone());
 
     el
@@ -58,31 +64,20 @@ class ThreeScene(
 
   scene.add(new Line(lineGeo, lineMaterial));
 
-  Range(0, 5).map(i => {
-
-    val testText = TextPlane("Test text " + i)
-    testText.position.copy(new Vector3(
-      Random.nextInt(10) - 5,
-      Random.nextInt(10) - 5,
-      -5 - Random.nextInt(10)))
-    scene.add(testText)
-
-  })
-
   val projector = new Projector()
   val raycaster = new Raycaster()
 
   def findIntersections(x:Double, y:Double) = {
 
-    val vector = new Vector3( x, y, 1 )
-    projector.unprojectVector( vector, camera )
+    val vector = new Vector3(x, y, 1)
+    projector.unprojectVector(vector, camera)
 
     raycaster
-      .set( camera.position, vector.sub( camera.position ).normalize() )
+      .set(camera.position, vector.sub(camera.position).normalize())
 
     raycaster
-      .intersectObjects( scene.children )
-      .sortWith( (a, b) => a.point.distanceTo(vector) < b.point.distanceTo(vector) )
+      .intersectObjects(scene.children)
+      .sortWith((a, b) => a.point.distanceTo(vector) < b.point.distanceTo(vector))
       .toList
   }
 

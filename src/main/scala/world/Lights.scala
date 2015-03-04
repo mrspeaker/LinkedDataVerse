@@ -1,4 +1,4 @@
-package RDFExplorer.world
+package LinkedDataVerse.world
 
 import scala.scalajs.js
 import org.denigma.threejs._
