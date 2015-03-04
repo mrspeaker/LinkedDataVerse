@@ -32,7 +32,7 @@ class MainScene(
     scene.add(testText)
   }
 
-  Lights(scene);
+  WorldHelper.addLights(scene);
 
   val boxGeom = new BoxGeometry(1, 1, 1)
 

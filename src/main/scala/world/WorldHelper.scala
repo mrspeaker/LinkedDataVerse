@@ -7,9 +7,9 @@ import org.scalajs.dom.html
 import org.scalajs.dom
 import dom.document
 
-object Lights {
+object WorldHelper {
 
-  def apply (scene: Scene): Unit = {
+  def addLights (scene: Scene): Unit = {
 
     // Some lights
     val dirLight1 = new DirectionalLight(0xffffff, 0.9)

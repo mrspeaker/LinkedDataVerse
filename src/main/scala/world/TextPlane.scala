@@ -9,16 +9,42 @@ import dom.document
 
 object TextPlane {
 
+  def wrapText(context: js.Dynamic, text: String, x: Int, y: Int, maxWidth: Int, lineHeight: Int ) {
+
+    val words = text.split(" ")
+    var line = ""
+    var yo = y
+
+    Range(0, words.length).map(n =>  {
+
+      val testLine = line + words(n) + " "
+      val metrics = context.measureText(testLine)
+      val testWidth = metrics.width.asInstanceOf[Double]
+
+      if (testWidth > maxWidth && n > 0) {
+        context.fillText(line, x, yo);
+        line = words(n) + " ";
+        yo = yo + lineHeight;
+      } else {
+        line = testLine;
+      }
+    })
+
+    context.fillText(line, x, yo);
+
+  }
+
+
   def apply (text: String): Mesh = {
 
     val canvas = document.createElement("canvas").asInstanceOf[html.Canvas]
     val ctx = canvas.getContext("2d")
     ctx.width = 256
     ctx.height = 128
-    ctx.textAlign = "center";
-    ctx.font = "22pt Helvetica"
+    //ctx.textAlign = "center";
+    ctx.font = "18pt Helvetica"
     ctx.fillStyle = "#000000"
-    ctx.fillText(text, 256 / 2, 30)
+    wrapText(ctx, text, 256 / 2, 30, 256, 22)
 
     val texture = new Texture(canvas);
     texture.needsUpdate = true;
