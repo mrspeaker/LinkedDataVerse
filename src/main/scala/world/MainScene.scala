@@ -64,6 +64,10 @@ class MainScene(
 
   scene.add(new Line(lineGeo, lineMaterial));
 
+  val img = ImgUrMesh("dAvWkN8.jpg")
+  img.position.set(2, 2, -5)
+  scene.add(img)
+
   val projector = new Projector()
   val raycaster = new Raycaster()
 
