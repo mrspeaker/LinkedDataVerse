@@ -4,10 +4,9 @@ import org.denigma.threejs.{Vector2, Vector3, Camera}
 import org.denigma.threejs.extensions.controls._
 import org.scalajs.dom
 import NavControls.HoverState
-import org.scalajs.dom.raw.{Event, MouseEvent, HTMLElement}
+import org.scalajs.dom.raw.{Event, KeyboardEvent, MouseEvent, HTMLElement}
 
 import scala.scalajs.js
-
 
 object NavControls {
 
@@ -30,7 +29,7 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   var userRotateSpeed = 1.0
 
   var userPan = true
-  var userPanSpeed = 2.0
+  var userPanSpeed = 0.3
 
   var autoRotate = false
   var autoRotateSpeed = 2.0 // 30 seconds per round when fps is 60
@@ -40,7 +39,6 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
 
   var minDistance = 0
   var maxDistance =  Double.MaxValue //infinity?
-
 
   object Keys {
 
@@ -73,13 +71,9 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
 
   def autoRotationAngle(): Double =  2 * Math.PI / 60 / 60 * autoRotateSpeed
 
-  def zoomScale(): Double =    Math.pow( 0.95, userZoomSpeed )
-
-
+  def zoomScale(): Double = Math.pow( 0.95, userZoomSpeed )
 
   var state:HoverState = NavControls.Calm
-
-
 
   def rotateLeft( angle:Double = autoRotationAngle() ): Unit =   thetaDelta -= angle
   def rotateRight( angle:Double = autoRotationAngle() ): Unit =   thetaDelta += angle
@@ -88,7 +82,6 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   def zoomIn(zScale:Double = this.zoomScale()): Unit = scale /= zScale
   def zoomOut(zScale:Double = this.zoomScale()): Unit = scale *= zScale
 
-
   def pan(distance:Vector3): Vector3 = {
     distance.transformDirection( this.camera.matrix )
     distance.multiplyScalar( userPanSpeed )
@@ -96,9 +89,7 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
     this.center.add( distance )
   }
 
-
   def update() =  {
-
 
     var offset = camera.position.clone().sub( this.center )
 
@@ -232,37 +223,53 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
     state = NavControls.Calm
   }
 
-  def onMouseWheel(event:dom.MouseEvent) = if(enabled && userZoom)
-  {
-    var delta = 0
-    val wheel = event.asInstanceOf[js.Dynamic]
-   // if ( wheel.wheelDelta != 0 ) { // WebKit / Opera / Explorer 9
-    //  delta = wheel.wheelDelta.asInstanceOf[Int]
-    //} else
-    if ( wheel.detail != 0 ) { // Firefox
-      delta = - event.detail:Int
+  def onKeyDown(e: KeyboardEvent): Unit = {
+    println(e.keyCode)
+    val vec = e.keyCode match {
+      case 37 => new Vector3(1, 0, 0)
+      case 38 => new Vector3(0, -1, 0)
+      case 39 => new Vector3(-1, 0, 0)
+      case 40 => new Vector3(0, 1, 0)
+      case _ => new Vector3(0, 0, 0)
     }
-    if ( delta > 0 ) {
-      zoomOut()
-    } else {
-      zoomIn()
+    pan(vec)
+  }
+  def onKeyUp(e: KeyboardEvent): Unit = {}
+
+  def onMouseWheel(event:dom.MouseEvent) = if(enabled && userZoom) {
+
+    var delta:Int = 0
+    val wheel = event.asInstanceOf[js.Dynamic]
+    if (!js.isUndefined(wheel.wheelDelta)){
+      delta = wheel.wheelDelta.asInstanceOf[Int]
+    }
+    else if (!js.isUndefined(wheel.detail)) { // Firefox
+      delta = - event.detail
+    }
+
+    if (delta != 0) {
+      if (delta > 0) {
+        zoomOut()
+      } else {
+        zoomIn()
+      }
     }
 
   }
-
-
 
   def attach(el:HTMLElement) = {
 
-    el.addEventListener( "mousedown", (this.onMouseDown _).asInstanceOf[Function[Event,_ ]] )
-    el.addEventListener( "mousemove", (this.onMouseMove _).asInstanceOf[Function[Event,_ ]], false )
-    el.addEventListener( "mouseup", (this.onMouseUp _).asInstanceOf[Function[Event,_ ]], false )
-    el.addEventListener( "mousewheel", (this.onMouseWheel _).asInstanceOf[Function[Event,_ ]] )
-    el.addEventListener( "DOMMouseScroll", (this.onMouseWheel _).asInstanceOf[Function[Event,_ ]], false ) // firefox
-    el.addEventListener( "contextmenu", (this.onContextMenu _).asInstanceOf[Function[Event,_ ]], false )
+    el.addEventListener( "mousedown", this.onMouseDown _, false )
+    el.addEventListener( "mousemove", this.onMouseMove _, false )
+    el.addEventListener( "mouseup", this.onMouseUp _, false )
+    el.addEventListener( "mousewheel", this.onMouseWheel _, false)
+    el.addEventListener( "DOMMouseScroll", this.onMouseWheel _, false ) // firefox
+    el.addEventListener( "contextmenu", this.onContextMenu _, false )
+
+    dom.document.addEventListener( "keydown", this.onKeyDown _, false )
+    dom.document.addEventListener( "keyup", this.onKeyUp _, false )
 
   }
-
 
   this.attach(element)
 }

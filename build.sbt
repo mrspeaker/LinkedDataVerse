@@ -1,6 +1,6 @@
 enablePlugins(ScalaJSPlugin)
 
-name := "RDF Explorer"
+name := "LinkedDataVerse"
 
 scalaVersion := "2.11.5"
 

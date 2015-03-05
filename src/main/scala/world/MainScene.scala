@@ -20,6 +20,7 @@ class MainScene(
 
   override def distance = 15
   override val controls = new NavControls(camera, this.container)
+  println(controls)
 
   private def randPos() = new Vector3(
     Random.nextInt(10) - 5,
