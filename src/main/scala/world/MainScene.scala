@@ -1,13 +1,13 @@
 package LinkedDataVerse.world
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
 
 import org.denigma.threejs._
 //import org.denigma.threejs.extensions.Container3D
 //import org.denigma.threejs.extensions.controls.CameraControls
 import LinkedDataVerse.controls._
 import LinkedDataVerse.scene.Container3D
+import LinkedDataVerse.Tween
 
 import org.scalajs.dom.raw.HTMLElement
 import scala.util.Random
@@ -15,20 +15,6 @@ import scala.util.Random
 import org.scalajs.dom.html
 import org.scalajs.dom
 import dom.document
-
-@JSName("TWEEN")
-object Tween extends js.Object {
-  val Tween: Tween = js.native
-  def update(): Boolean = js.native
-}
-@JSName("TWEEN.Tween")
-class Tween extends js.Object {
-  def this(obj: js.Object) = this()
-  def to(properties: js.Object = js.native, duration: js.UndefOr[Double] = js.native): Tween = js.native
-  def start(): Tween = js.native
-  def onUpdate(callback: js.Function1[Double, Unit]): Tween = js.native
-  def onComplete(callback: js.Function0[Unit]): Tween = js.native
-}
 
 class MainScene(
   val container:HTMLElement,
@@ -144,6 +130,7 @@ class MainScene(
       new Tween(camera.position)
 
         .to(endPos, 1000)
+        .easing(Tween.Easing.Sinusoidal.InOut)
         .onUpdate((v:Double) => {
           camera.lookAt(endRotPos)
           controls.reCenter(origCenter.lerp(endRotPos, v))
@@ -157,6 +144,7 @@ class MainScene(
         .start()
 
     }
+
     controls.clicked = false
 
     Tween.update()
