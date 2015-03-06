@@ -18,8 +18,7 @@ object App extends JSApp {
   lazy val world = new MainScene(el, 640, 480)
 
   def main(): Unit = {
-    appendP(document.body, "RDF Explorer")
-
+    appendP(document.body, "LinkedDataVerse")
     world.render()
   }
 
@@ -29,7 +28,6 @@ object App extends JSApp {
     parNode.appendChild(textNode)
     targetNode.appendChild(parNode)
   }
-
 
   @JSExport
   def fetch(e: dom.Event): Unit = {

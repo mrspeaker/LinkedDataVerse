@@ -226,10 +226,10 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   def onKeyDown(e: KeyboardEvent): Unit = {
     println(e.keyCode)
     val vec = e.keyCode match {
-      case 37 => new Vector3(1, 0, 0)
-      case 38 => new Vector3(0, -1, 0)
-      case 39 => new Vector3(-1, 0, 0)
-      case 40 => new Vector3(0, 1, 0)
+      case 65 => new Vector3(1, 0, 0)
+      case 87 => new Vector3(0, -1, 0)
+      case 68 => new Vector3(-1, 0, 0)
+      case 83 => new Vector3(0, 1, 0)
       case _ => new Vector3(0, 0, 0)
     }
     pan(vec)
@@ -258,6 +258,8 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   }
 
   def attach(el:HTMLElement) = {
+
+    //js.Dynamic.global.TWEAN.Easing.Sinusoidal.InOut(1).asInstanceOf[Double]
 
     el.addEventListener( "mousedown", this.onMouseDown _, false )
     el.addEventListener( "mousemove", this.onMouseMove _, false )

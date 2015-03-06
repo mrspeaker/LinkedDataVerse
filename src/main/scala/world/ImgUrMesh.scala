@@ -13,8 +13,7 @@ object ImgUrMesh {
 
     val material = new MeshBasicMaterial(js.Dynamic.literal(
       map = ImageUtils.loadTexture(url),
-      side = 2 /* THREE.DOubleSide */
-
+      side = 2 /*THREE.DoubleSide (throwing runtime weirdness*/
     ).asInstanceOf[MeshBasicMaterialParameters])
 
     val geom = new PlaneGeometry(1, 1, 4, 4)

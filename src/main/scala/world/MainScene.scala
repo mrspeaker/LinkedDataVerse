@@ -20,7 +20,6 @@ class MainScene(
 
   override def distance = 15
   override val controls = new NavControls(camera, this.container)
-  println(controls)
 
   private def randPos() = new Vector3(
     Random.nextInt(10) - 5,
@@ -116,6 +115,10 @@ class MainScene(
     if (!hits.isEmpty) {
       hits.head._1.position.z -= 0.05;
     }
+
+
+    // return 0.5 * ( 1 - Math.cos( Math.PI * k ) );
+    ///val hmm = js.Dynamic.literal.applyDynamic("TWEEN.Easing.Sinusoidal.InOut") _
 
   }
 
