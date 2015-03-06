@@ -1,10 +1,13 @@
 package LinkedDataVerse.world
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation._
+
 import org.denigma.threejs._
-import org.denigma.threejs.extensions.Container3D
-import org.denigma.threejs.extensions.controls.CameraControls
-import LinkedDataVerse.controls.NavControls
+//import org.denigma.threejs.extensions.Container3D
+//import org.denigma.threejs.extensions.controls.CameraControls
+import LinkedDataVerse.controls._
+import LinkedDataVerse.scene.Container3D
 
 import org.scalajs.dom.raw.HTMLElement
 import scala.util.Random
@@ -13,18 +16,36 @@ import org.scalajs.dom.html
 import org.scalajs.dom
 import dom.document
 
+@JSName("TWEEN")
+object Tween extends js.Object {
+  val Tween: Tween = js.native
+  def update(): Boolean = js.native
+}
+@JSName("TWEEN.Tween")
+class Tween extends js.Object {
+  def this(obj: js.Object) = this()
+  def to(properties: js.Object = js.native, duration: js.UndefOr[Double] = js.native): Tween = js.native
+  def start(): Tween = js.native
+  def onUpdate(callback: js.Function1[Double, Unit]): Tween = js.native
+  def onComplete(callback: js.Function0[Unit]): Tween = js.native
+}
+
 class MainScene(
   val container:HTMLElement,
   var width:Double,
   var height:Double) extends Container3D {
 
   override def distance = 15
-  override val controls = new NavControls(camera, this.container)
+  //override val controls = new NavControls(camera, this.container)
 
-  private def randPos() = new Vector3(
-    Random.nextInt(10) - 5,
-    Random.nextInt(10) - 5,
-    -5 - Random.nextInt(10))
+  private def randPos() = {
+    val dist = 80
+    val half = dist / 2
+    new Vector3(
+      Random.nextInt(dist) - half,
+      Random.nextInt(dist) - half,
+      -half - Random.nextInt(dist))
+  }
 
   def addABox(text: String) {
     val testText = TextPlane(text)
@@ -40,7 +61,7 @@ class MainScene(
     color = new Color().setHex(0xffffff)
   ).asInstanceOf[MeshLambertMaterialParameters])
 
-  val meshes:Seq[Mesh] = Range(0, 10).map(i => {
+  val meshes:Seq[Mesh] = Range(0, 100).map(i => {
 
     val mesh = new Mesh(boxGeom, plainMaterial)
     mesh.position.copy(randPos())
@@ -58,11 +79,10 @@ class MainScene(
   val lineGeo = new Geometry();
   meshes.foldLeft (meshes(0)) { (ac, el) =>
     lineGeo.vertices.push(el.position.clone());
-
     el
   }
 
-  scene.add(new Line(lineGeo, lineMaterial));
+  //scene.add(new Line(lineGeo, lineMaterial));
 
   val img = ImgUrMesh("dAvWkN8.jpg")
   img.position.set(2, 2, -5)
@@ -97,11 +117,14 @@ class MainScene(
 
   }
 
+  val startPos = new Vector3(0, 0, 0)
+  val endPos = new Vector3(0, 0, 0)
+  var tracking = false
   override def onEnterFrame() {
 
     super.onEnterFrame()
 
-    camera.position.z += (Math.sin(java.lang.System.currentTimeMillis() / 800.0) * 0.01)
+    //camera.position.z += (Math.sin(java.lang.System.currentTimeMillis() / 800.0) * 0.01)
 
     meshes(1).rotation.y += 0.01;
     meshes(2).rotation.y += 0.015;
@@ -112,12 +135,33 @@ class MainScene(
       width,
       height);
 
-    if (!hits.isEmpty) {
-      hits.head._1.position.z -= 0.05;
+    if (!hits.isEmpty && controls.clicked) {
+
+      val endRotPos = hits.head._1.position
+      val endPos = endRotPos.clone().add(new Vector3(0, 0, 4))
+      val origCenter = controls.center.clone()
+
+      new Tween(camera.position)
+
+        .to(endPos, 1000)
+        .onUpdate((v:Double) => {
+          camera.lookAt(endRotPos)
+          controls.reCenter(origCenter.lerp(endRotPos, v))
+        })
+        .onComplete(() => {
+          controls.scale = 1.0
+          camera.position.copy(endPos)
+
+
+        }:Unit)
+        .start()
+
     }
+    controls.clicked = false
 
+    Tween.update()
 
-    // return 0.5 * ( 1 - Math.cos( Math.PI * k ) );
+    //  0.5 * ( 1 - Math.cos( Math.PI * k ) );
     ///val hmm = js.Dynamic.literal.applyDynamic("TWEEN.Easing.Sinusoidal.InOut") _
 
   }

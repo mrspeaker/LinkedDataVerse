@@ -18,9 +18,10 @@ object NavControls {
 
 }
 
-class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new Vector3()) extends RotateControls {
+class NavControls(camera:Camera, element:HTMLElement) extends CameraControls {
 
   var enabled = true
+  var center:Vector3 = new Vector3()
 
   var userZoom = true
   var userZoomSpeed = 1.0
@@ -68,6 +69,8 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
 
   var lastPosition = new Vector3()
   var lastMousePos = (0d, 0d)
+  var mouseDownAt = 0l
+  var clicked = false
 
   def autoRotationAngle(): Double =  2 * Math.PI / 60 / 60 * autoRotateSpeed
 
@@ -87,6 +90,13 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
     distance.multiplyScalar( userPanSpeed )
     camera.position.add( distance )
     this.center.add( distance )
+  }
+
+  def reCenter(newCenter: Vector3):Unit = {
+    center.copy(newCenter)
+    scale = 1.0
+    phiDelta = 0
+    thetaDelta = 0
   }
 
   def update() =  {
@@ -141,16 +151,19 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   }
 
 
-  def onMouseDown( event:MouseEvent ) = if(userRotate && enabled){
+  def onMouseDown( event:MouseEvent ) = if(userRotate && enabled) {
+
+    mouseDownAt = java.lang.System.currentTimeMillis()
 
     //event.preventDefault()
-    if(state == NavControls.Calm)
+    if(state == NavControls.Calm) {
       state = event.button match
       {
         case 0=>NavControls.Rotate
         case 1=>NavControls.Zoom
         case 2=>NavControls.Pan
       }
+    }
 
     state match {
       case NavControls.Rotate=>
@@ -221,10 +234,12 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
 
   def onMouseUp( event:MouseEvent ):Unit = if(enabled && userRotate){
     state = NavControls.Calm
+    if (java.lang.System.currentTimeMillis() - mouseDownAt < 300) {
+      clicked = true
+    }
   }
 
   def onKeyDown(e: KeyboardEvent): Unit = {
-    println(e.keyCode)
     val vec = e.keyCode match {
       case 65 => new Vector3(1, 0, 0)
       case 87 => new Vector3(0, -1, 0)
@@ -237,6 +252,8 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
   def onKeyUp(e: KeyboardEvent): Unit = {}
 
   def onMouseWheel(event:dom.MouseEvent) = if(enabled && userZoom) {
+
+    event.preventDefault()
 
     var delta:Int = 0
     val wheel = event.asInstanceOf[js.Dynamic]
@@ -259,11 +276,20 @@ class NavControls(camera:Camera, element:HTMLElement, val center:Vector3 = new V
 
   def attach(el:HTMLElement) = {
 
-    //js.Dynamic.global.TWEAN.Easing.Sinusoidal.InOut(1).asInstanceOf[Double]
+    //js.Dynamic.global.TWEEN.Easing.Sinusoidal.InOut(1).asInstanceOf[Double]
+    /*
+      @JSName("TWEEN.Easing.Sinusoidal")extends js.Object
+      object Sinusoidal {
+        def InOut(x: Double): Double = js.naati
+      }
+    */
 
     el.addEventListener( "mousedown", this.onMouseDown _, false )
     el.addEventListener( "mousemove", this.onMouseMove _, false )
     el.addEventListener( "mouseup", this.onMouseUp _, false )
+    /*el.addEventListener( "click", (e: MouseEvent) => {
+      println("click")
+    }, false )*/
     el.addEventListener( "mousewheel", this.onMouseWheel _, false)
     el.addEventListener( "DOMMouseScroll", this.onMouseWheel _, false ) // firefox
     el.addEventListener( "contextmenu", this.onContextMenu _, false )

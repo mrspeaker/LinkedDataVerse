@@ -51,7 +51,8 @@ object TextPlane {
 
     val canMaterial = new MeshBasicMaterial(js.Dynamic.literal(
       map = texture,
-      transparent = true
+      transparent = true,
+      side = 2 /*THREE.DoubleSied*/
     ).asInstanceOf[MeshBasicMaterialParameters]);
 
     val canGeometry = new PlaneGeometry(canvas.width, canvas.height, 1, 1);
