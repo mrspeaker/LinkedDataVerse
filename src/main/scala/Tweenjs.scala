@@ -20,21 +20,20 @@ class Tween extends js.Object {
   def easing(easing: EasingFunc): Tween = js.native
 }
 
-trait EasingFunc extends js.Function1[Double, Double]
-
 trait Easing extends js.Object {
   def Linear: Linear = js.native
   def Sinusoidal: Sinusoidal = js.native
 }
+trait EasingFunc extends js.Function1[Double, Double]
 
 trait Linear extends js.Object {
   def None: EasingFunc = js.native
 }
 
 trait Sinusoidal extends js.Object {
-  def InOut: EasingFunc = js.native
   def In: EasingFunc = js.native
   def Out: EasingFunc = js.native
+  def InOut: EasingFunc = js.native
 }
 
 

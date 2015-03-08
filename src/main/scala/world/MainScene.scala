@@ -74,6 +74,8 @@ class MainScene(
   img.position.set(2, 2, -5)
   scene.add(img)
 
+  tweenTo(img.position)
+
   val projector = new Projector()
   val raycaster = new Raycaster()
 
@@ -103,9 +105,32 @@ class MainScene(
 
   }
 
-  val startPos = new Vector3(0, 0, 0)
-  val endPos = new Vector3(0, 0, 0)
-  var tracking = false
+  def tweenTo (pos: Vector3) = {
+
+    val origCenter = controls.center.clone()
+
+    val endPos = new Vector3()
+      .subVectors(camera.position, pos)
+      .normalize()
+      .multiplyScalar(4)
+      .add(pos);
+
+    new Tween(camera.position)
+      .to(endPos, 1000)
+      .easing(Tween.Easing.Sinusoidal.InOut)
+      .onUpdate((v:Double) => {
+        camera.lookAt(pos)
+        controls.reCenter(origCenter.lerp(pos, v))
+      })
+      .onComplete(() => {
+        controls.scale = 1.0
+        camera.position.copy(endPos)
+
+
+      }:Unit)
+      .start()
+  }
+
   override def onEnterFrame() {
 
     super.onEnterFrame()
@@ -123,34 +148,13 @@ class MainScene(
 
     if (!hits.isEmpty && controls.clicked) {
 
-      val endRotPos = hits.head._1.position
-      val endPos = endRotPos.clone().add(new Vector3(0, 0, 4))
-      val origCenter = controls.center.clone()
-
-      new Tween(camera.position)
-
-        .to(endPos, 1000)
-        .easing(Tween.Easing.Sinusoidal.InOut)
-        .onUpdate((v:Double) => {
-          camera.lookAt(endRotPos)
-          controls.reCenter(origCenter.lerp(endRotPos, v))
-        })
-        .onComplete(() => {
-          controls.scale = 1.0
-          camera.position.copy(endPos)
-
-
-        }:Unit)
-        .start()
+      tweenTo(hits.head._1.position)
 
     }
 
     controls.clicked = false
 
     Tween.update()
-
-    //  0.5 * ( 1 - Math.cos( Math.PI * k ) );
-    ///val hmm = js.Dynamic.literal.applyDynamic("TWEEN.Easing.Sinusoidal.InOut") _
 
   }
 
